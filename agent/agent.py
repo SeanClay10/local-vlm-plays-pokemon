@@ -5,23 +5,33 @@ from qwen_vl_utils import process_vision_info
 import time
 import threading
 from agent.emulator import Emulator
+from transformers import BitsAndBytesConfig
 from PIL import Image
 import json
 
 class LocalSimpleAgent:
     def __init__(self, rom_path, model_name="Qwen/Qwen2-VL-2B-Instruct", headless=True):
-        """Initialize agent with basic model loading."""
+        """Initialize agent with quantized model."""
         self.emulator = Emulator(rom_path, headless, sound=False)
         self.emulator.initialize()
         
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Loading model on {self.device}...")
+        print(f"Loading quantized model on {self.device}...")
         
-        # Basic model loading (NO quantization yet)
+        # === QUANTIZATION ADDED ===
+        quantization_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+        )
+        
         self.model = Qwen3VLForConditionalGeneration.from_pretrained(
             model_name,
+            quantization_config=quantization_config,
+            device_map="auto",
             torch_dtype=torch.float16,
-            device_map="auto"
+            attn_implementation="sdpa"
         )
         
         self.processor = AutoProcessor.from_pretrained(model_name)
