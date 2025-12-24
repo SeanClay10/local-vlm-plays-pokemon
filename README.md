@@ -2,11 +2,15 @@
 
 > An autonomous AI agent that plays Pokémon Red using computer vision and a local Vision-Language Model (VLM).
 
+<div align="center">
+  <img src="assets/emulator_screenshot.png" width="600" style="border: 4px solid #000000ff;">
+  <p><i>The AI navigating the world of Pokémon Red.</i></p>
+</div>
+
 This project is an experimental AI agent that plays **Pokémon Red** autonomously by analyzing screenshots and making decisions through a locally hosted instance of **Qwen3-VL**. 
 
 Most autonomous agents depend on an exuberant number of API calls (like Claude or GPT-4o), which can cost ~$150 for a full 10,000-round playthrough. This project runs entirely on your hardware, eliminating API fees.
 
----
 
 ## Project Goals
 
@@ -14,8 +18,6 @@ Most autonomous agents depend on an exuberant number of API calls (like Claude o
 -   **Local Inference:** Zero-cost gameplay by utilizing local hardware rather than paid APIs.
 -   **Memory Management:** Implement "Sliding Window" memory and efficient prompting to handle the high token count of image inputs.
 -   **Visual Reasoning:** Force the AI to interpret 8-bit graphics and UI elements just like a human player.
-
----
 
 ## How It Works
 The agent operates in a continuous "Perception → Reasoning → Action" loop:
@@ -26,7 +28,9 @@ The agent operates in a continuous "Perception → Reasoning → Action" loop:
 4. **Action:** The model outputs a JSON object containing reasoning and a specific button press.
 5. **Execution:** The agent simulates the hardware button press in the emulator.
 
----
+<div align="center">
+  <img src="assets/step_example.png" width="400">
+</div>
 
 ## Project Structure
 
@@ -83,8 +87,6 @@ Rather than planning a long route, the AI makes decisions every 1–2 seconds. T
 -   **Rapid Correction:** If the AI accidentally walks into a wall or enters the wrong door, it sees the mistake immediately in the next frame and adjusts.
 - **Human-Like Reassessment:** Mirrors how a human player would constantly check their position after every few steps.
 
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -127,6 +129,11 @@ The project will automatically download Qwen3-VL via HuggingFace on first run, o
 ```
 python .\main.py --display --sound
 ```
+
+<div align="center">
+  <img src="assets/sys_init.png" width="500">
+</div>
+
 ### Command-Line Arguments
 
 | Argument | Type | Default | Description |
@@ -138,8 +145,6 @@ python .\main.py --display --sound
 | `--max-history`| `int` | `30` | Max messages in history before the AI summarizes them. |
 | `--load-state` | `str` | `None` | Path to a saved `.state` file to start from a specific point. |
 
----
-
 
 ## Future Enhancements
 
@@ -148,8 +153,6 @@ python .\main.py --display --sound
 -   **Pre-computed Vision Features:** Implement OCR and template matching to specifically identify HP bars and text boxes, reducing the cognitive load on the LLM.
 -   **LoRA Fine-Tuning:** Fine-tune a Qwen3-VL LoRA specifically on Pokémon Red gameplay data to improve menu navigation and move selection.
 -   **Automated Curriculum Learning:** Allow the agent to "save state" before a difficult area and attempt it multiple times with different prompt strategies until it succeeds.
-
----
 
 
 ## License
