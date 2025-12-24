@@ -180,6 +180,8 @@ class LocalSimpleAgent:
                     print(f"Action: {result}")
                 
                 steps_completed += 1
+                if len(self.message_history) >= 20:
+                    self.summarize_history()
                 
             except KeyboardInterrupt:
                 self.running = False
@@ -189,6 +191,41 @@ class LocalSimpleAgent:
         
         self.stop()
         return steps_completed
+    
+    def summarize_history(self):
+        """Summarize conversation to manage context."""
+        print("Summarizing history...")
+        
+        screenshot = self.emulator.get_screenshot()
+        memory_info = self.emulator.get_state_from_memory()
+        
+        summary_messages = self.message_history.copy()
+        summary_messages.append({
+            "role": "user",
+            "content": [{"type": "text", "text": "Summarize gameplay progress in 2-3 sentences."}]
+        })
+        
+        text = self.processor.apply_chat_template(summary_messages, tokenize=False, add_generation_prompt=True)
+        image_inputs, video_inputs = process_vision_info(summary_messages)
+        
+        inputs = self.processor(text=[text], images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt")
+        inputs = inputs.to(self.device)
+        
+        with torch.no_grad():
+            generated_ids = self.model.generate(**inputs, max_new_tokens=200, temperature=0.7)
+        
+        generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)]
+        summary_text = self.processor.batch_decode(generated_ids_trimmed, skip_special_tokens=True)[0]
+        
+        # Replace history with summary
+        self.message_history = [
+            {"role": "user", "content": [
+                {"type": "text", "text": f"Summary: {summary_text}\nCurrent state: {memory_info}"},
+                {"type": "text", "text": "Current screenshot:"},
+                {"type": "image", "image": screenshot}
+            ]},
+            {"role": "assistant", "content": [{"type": "text", "text": "Understood."}]}
+        ]
 
     def stop(self):
         """Stop agent."""
