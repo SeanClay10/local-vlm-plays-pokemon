@@ -3,7 +3,7 @@
 > An autonomous AI agent that plays Pokémon Red using computer vision and a local Vision-Language Model (VLM).
 
 <div align="center">
-  <img src="assets/emulator_screenshot.png" width="600" style="border: 4px solid #000000ff;">
+  <img src="assets/emulator_screenshot.png" width="450" style="border: 6px solid #000000ff;">
   <p><i>The AI navigating the world of Pokémon Red.</i></p>
 </div>
 
@@ -131,7 +131,7 @@ python .\main.py --display --sound
 ```
 
 <div align="center">
-  <img src="assets/sys_init.png" width="500">
+  <img src="assets/sys_init.png" width="400">
 </div>
 
 ### Command-Line Arguments
