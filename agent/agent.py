@@ -110,6 +110,44 @@ class LocalSimpleAgent:
             return f"Pressed: {', '.join(buttons)}"
         
         return "Unknown tool"
+    
+    def run(self, num_steps=10):
+        """Main loop (BLOCKING - freezes emulator)."""
+        print(f"Starting {num_steps} steps...")
+        
+        steps_completed = 0
+        while self.running and steps_completed < num_steps:
+            try:
+                # Get game state
+                screenshot = self.emulator.get_screenshot()
+                memory_info = self.emulator.get_state_from_memory()
+                
+                print(f"\nStep {steps_completed + 1}/{num_steps}")
+                print(f"Location: {memory_info.split('Location:')[1].split()[0] if 'Location:' in memory_info else 'Unknown'}")
+                
+                # BLOCKING CALL - emulator freezes here!
+                response_text = self.generate_response(screenshot, memory_info)
+                
+                response_json = self.parse_response(response_text)
+                
+                reasoning = response_json.get("reasoning", "No reasoning")
+                print(f"Reasoning: {reasoning}")
+                
+                tool_calls = response_json.get("tool_calls", [])
+                for tool_call in tool_calls:
+                    result = self.process_tool_call(tool_call)
+                    print(f"Action: {result}")
+                
+                steps_completed += 1
+                
+            except KeyboardInterrupt:
+                self.running = False
+            except Exception as e:
+                print(f"Error: {e}")
+                steps_completed += 1
+        
+        self.stop()
+        return steps_completed
 
     def stop(self):
         """Stop agent."""
