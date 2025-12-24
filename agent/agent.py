@@ -153,7 +153,7 @@ class LocalSimpleAgent:
                 screenshot = self.emulator.get_screenshot()
                 memory_info = self.emulator.get_state_from_memory()
                 
-                 print(f"\n{Colors.HEADER}Step {steps_completed + 1}/{num_steps}{Colors.RESET}")
+                print(f"\n{Colors.HEADER}Step {steps_completed + 1}/{num_steps}{Colors.RESET}")
                 
                 ai_response = {}
                 
