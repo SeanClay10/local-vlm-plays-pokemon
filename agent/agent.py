@@ -10,7 +10,7 @@ from PIL import Image
 import json
 
 class LocalSimpleAgent:
-    def __init__(self, rom_path, model_name="Qwen/Qwen2-VL-2B-Instruct", headless=True):
+    def __init__(self, rom_path, model_name="Qwen/Qwen3-VL-2B-Instruct", headless=True):
         """Initialize agent with quantized model."""
         self.emulator = Emulator(rom_path, headless, sound=False)
         self.emulator.initialize()
