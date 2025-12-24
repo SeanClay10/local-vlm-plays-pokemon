@@ -83,6 +83,36 @@ class Emulator:
         
         return "\n".join(results)
 
+    def get_coordinates(self):
+        """
+        Returns the player's current coordinates from game memory.
+        Returns:
+            tuple[int, int]: (x, y) coordinates
+        """
+        reader = PokemonRedReader(self.pyboy.memory)
+        return reader.read_coordinates()
+
+    def get_active_dialog(self):
+        """
+        Returns the active dialog text from game memory.
+        Returns:
+            str: Dialog text
+        """
+        reader = PokemonRedReader(self.pyboy.memory)
+        dialog = reader.read_dialog()
+        if dialog:
+            return dialog
+        return None
+
+    def get_location(self):
+        """
+        Returns the player's current location name from game memory.
+        Returns:
+            str: Location name
+        """
+        reader = PokemonRedReader(self.pyboy.memory)
+        return reader.read_location()
+
     def get_state_from_memory(self) -> str:
         """
         Reads the game state from memory and returns a string representation of it.
