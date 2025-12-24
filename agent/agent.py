@@ -9,6 +9,15 @@ from transformers import BitsAndBytesConfig
 from PIL import Image
 import json
 
+class Colors:
+    WHITE = '\033[97m'
+    HEADER = '\033[96m'
+    VISION = '\033[92m'
+    THOUGHTS = '\033[93m'
+    ACTION = '\033[95m'
+    ERROR = '\033[91m'
+    RESET = '\033[0m'
+
 class LocalSimpleAgent:
     def __init__(self, rom_path, model_name="Qwen/Qwen3-VL-2B-Instruct", headless=True):
         """Initialize agent with quantized model."""
@@ -144,7 +153,7 @@ class LocalSimpleAgent:
                 screenshot = self.emulator.get_screenshot()
                 memory_info = self.emulator.get_state_from_memory()
                 
-                print(f"\nStep {steps_completed + 1}/{num_steps}")
+                 print(f"\n{Colors.HEADER}Step {steps_completed + 1}/{num_steps}{Colors.RESET}")
                 
                 ai_response = {}
                 
@@ -184,15 +193,15 @@ class LocalSimpleAgent:
 
                 visual = response_json.get("visual_observation", "")
                 if visual:
-                    print(f"Vision: {visual}")
+                    print(f"{Colors.VISION}Vision: {visual}{Colors.RESET}")
                 
-                reasoning = response_json.get("reasoning", "No reasoning")
-                print(f"Reasoning: {reasoning}")
+                reasoning = response_json.get("reasoning", "")
+                print(f"{Colors.THOUGHTS}Reasoning: {reasoning}{Colors.RESET}")
                 
                 tool_calls = response_json.get("tool_calls", [])
                 for tool_call in tool_calls:
                     result = self.process_tool_call(tool_call)
-                    print(f"Action: {result}")
+                    print(f"{Colors.ACTION}Action: {result}{Colors.RESET}")
                 
                 steps_completed += 1
                 if len(self.message_history) >= 20:
