@@ -44,7 +44,12 @@ class LocalSimpleAgent:
         
         qwen_messages.append({
             "role": "user",
-            "content": [{"type": "text", "text": "You are playing Pokemon Red. Respond in JSON with: {\"reasoning\": \"...\", \"tool_calls\": [{\"name\": \"press_buttons\", \"input\": {\"buttons\": [\"a\"], \"wait\": true}}]}"}]
+            "content": [{"type": "text", "text": """You are playing Pokemon Red. Respond in JSON:
+            {
+                "visual_observation": "What you SEE on screen",
+                "reasoning": "Why you're taking this action",
+                "tool_calls": [{"name": "press_buttons", "input": {"buttons": ["a"], "wait": true}}]
+            }"""}]
         })
         qwen_messages.append({
             "role": "assistant", 
@@ -176,6 +181,10 @@ class LocalSimpleAgent:
                     continue
                 
                 response_json = self.parse_response(ai_response['text'])
+
+                visual = response_json.get("visual_observation", "")
+                if visual:
+                    print(f"Vision: {visual}")
                 
                 reasoning = response_json.get("reasoning", "No reasoning")
                 print(f"Reasoning: {reasoning}")
