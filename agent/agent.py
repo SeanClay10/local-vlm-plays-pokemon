@@ -334,7 +334,7 @@ class Agent:
                 memory_info = self.emulator.get_state_from_memory()
                 collision_map = self.emulator.get_collision_map()
 
-                screenshot.save("logs/last_vision_input.png")
+                screenshot.save("screenshots/last_screenshot.png")
 
                 # Parse Location and Money for the header
                 location = "Unknown"
