@@ -39,10 +39,9 @@ class LocalSimpleAgent:
         self.running = True
 
     def prepare_messages_for_model(self, messages: List[Dict], new_user_content: List[Dict]) -> List[Dict]:
-        """Prepare messages in Qwen format."""
+        """Prepare messages - strip old images to save memory."""
         qwen_messages = []
         
-        # Add system prompt
         qwen_messages.append({
             "role": "user",
             "content": [{"type": "text", "text": "You are playing Pokemon Red. Respond in JSON with: {\"reasoning\": \"...\", \"tool_calls\": [{\"name\": \"press_buttons\", \"input\": {\"buttons\": [\"a\"], \"wait\": true}}]}"}]
@@ -52,11 +51,18 @@ class LocalSimpleAgent:
             "content": [{"type": "text", "text": "Ready."}]
         })
         
-        # Add previous messages
         for msg in messages:
-            qwen_messages.append(msg)
+            clean_content = []
+            for item in msg["content"]:
+                if item["type"] == "text":
+                    clean_content.append(item)
+            
+            if clean_content:
+                qwen_messages.append({
+                    "role": msg["role"],
+                    "content": clean_content
+                })
         
-        # Add new content
         qwen_messages.append({"role": "user", "content": new_user_content})
         
         return qwen_messages
