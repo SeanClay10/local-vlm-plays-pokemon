@@ -2,6 +2,8 @@ import torch
 from typing import List, Dict, Any
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 from qwen_vl_utils import process_vision_info
+import time
+import threading
 from agent.emulator import Emulator
 from PIL import Image
 import json
@@ -112,23 +114,52 @@ class LocalSimpleAgent:
         return "Unknown tool"
     
     def run(self, num_steps=10):
-        """Main loop (BLOCKING - freezes emulator)."""
+        """Main loop with THREADING - emulator stays responsive."""
         print(f"Starting {num_steps} steps...")
         
         steps_completed = 0
         while self.running and steps_completed < num_steps:
             try:
-                # Get game state
                 screenshot = self.emulator.get_screenshot()
                 memory_info = self.emulator.get_state_from_memory()
                 
                 print(f"\nStep {steps_completed + 1}/{num_steps}")
-                print(f"Location: {memory_info.split('Location:')[1].split()[0] if 'Location:' in memory_info else 'Unknown'}")
                 
-                # BLOCKING CALL - emulator freezes here!
-                response_text = self.generate_response(screenshot, memory_info)
+                ai_response = {}
                 
-                response_json = self.parse_response(response_text)
+                def get_ai_decision():
+                    """Run AI in separate thread."""
+                    try:
+                        response_text = self.generate_response(screenshot, memory_info)
+                        ai_response['text'] = response_text
+                    except Exception as e:
+                        ai_response['error'] = str(e)
+                
+                # Start AI thread
+                ai_thread = threading.Thread(target=get_ai_decision)
+                ai_thread.start()
+                
+                # Keep emulator running while AI thinks
+                last_time = time.perf_counter()
+                FRAME_TIME = 1/60
+                
+                while ai_thread.is_alive():
+                    current_time = time.perf_counter()
+                    delta = current_time - last_time
+                    
+                    if delta >= FRAME_TIME:
+                        self.emulator.pyboy.tick()
+                        last_time = current_time - (delta % FRAME_TIME)
+                    else:
+                        time.sleep(0.001)
+                
+                # Process response
+                if 'error' in ai_response:
+                    print(f"AI Error: {ai_response['error']}")
+                    steps_completed += 1
+                    continue
+                
+                response_json = self.parse_response(ai_response['text'])
                 
                 reasoning = response_json.get("reasoning", "No reasoning")
                 print(f"Reasoning: {reasoning}")
