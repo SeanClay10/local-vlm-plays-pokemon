@@ -76,7 +76,6 @@ def main():
     
     try:
         steps_completed = agent.run(num_steps=args.steps)
-        logger.info(f"Agent completed {steps_completed} steps")
     except KeyboardInterrupt:
         logger.info("Received keyboard interrupt, stopping")
     except Exception as e:
