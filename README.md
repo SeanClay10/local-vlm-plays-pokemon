@@ -9,7 +9,7 @@
 
 This project is an experimental AI agent that plays **Pokémon Red** autonomously by analyzing screenshots and making decisions through a locally hosted instance of **Qwen3-VL**. 
 
-Most autonomous agents depend on an exuberant number of API calls (like Claude or GPT-4o), which can cost ~$150 for a full 10,000-round playthrough. This project runs entirely on your hardware, eliminating API fees.
+Most autonomous agents depend on an exuberant number of API calls (like Claude or GPT-4o), which can cost ~$150 for a full 10,000 round playthrough. This project runs entirely on your hardware, eliminating API costs.
 
 
 ## Project Goals
@@ -42,14 +42,15 @@ local-vlm-plays-pokemon/
 │   ├── emulator.py         # PyBoy wrapper for screenshots and input
 │   └── ram_retrieval.py    # RAM memory retrieval functions
 ├── assets/
-│   ├── sys_init.png
+│   ├── emulator_screenshot.png
 │   ├── step_example.png
-│   └── ram_reader.py       # RAM memory retrieval functions
-├── logs/
+│   └── sys_init.png
+├── screenshots/
 │   └── last_screenshot.png # Last screenshot taken by PyBoy
-├── .gitignore              # Files to exclude from Git (e.g., venv, logs, ROMs)
-├── __init__.py             # Root package initializer
+├── .gitignore
+├── __init__.py
 ├── config.py               # Model paths, GPU settings, and hyperparameters
+├── LICENSE                 # Unlicense file
 ├── main.py                 # Entry point for the agent loop
 ├── pokemon.gb              # Your Pokemon Red ROM file
 ├── README.md               # Project documentation and setup guide
@@ -58,12 +59,12 @@ local-vlm-plays-pokemon/
 ```
 ## Technical Design Decisions
 
-### 4-bit Model 
+### 4-bit Quantization (NF4)
 
-To ensure the agent remains accessible to users with mid-range hardware, 4-bit NF4 quantization is utilized.
+To ensure the agent remains accessible to users with mid-range hardware, 4-bit quantization is utilized.
 
 -   **VRAM Efficiency:** By quantizing the model, the VRAM footprint is reduced by ~70%, allowing it to fit into lower amounts of VRAM while maintaining near original reasoning capabilities.
--   **Compute Optimization:** torch.float16 is used for compute and Double Quantization to squeeze out extra performance without sacrificing the model's ability to recognize small 8-bit sprites.
+-   **Compute Optimization:** Uses torch.float16 for compute and Double Quantization to squeeze out extra performance without sacrificing the model's ability to recognize small 8-bit sprites.
 
 ### Hybrid Perception Strategy
 
@@ -91,7 +92,7 @@ Rather than planning a long route, the AI makes decisions every 1–2 seconds. T
 
 ### Prerequisites
 
--   **Python 3.10+**
+-   **Python 3.12**
 -   **NVIDIA GPU:** RTX 3060 (12GB) or better recommended
 -   **Pokémon Red ROM**: You must legally own a copy
 
@@ -111,7 +112,7 @@ python -m venv venv
 # Linux/Mac
 source venv/bin/activate
 # Windows
-.\venv\scripts\activate
+.\venv\Scripts\activate
 ```
 
 3. **Install requirements**
@@ -131,7 +132,7 @@ python .\main.py --display --sound
 ```
 
 <div align="center">
-  <img src="assets/sys_init.png" width="400">
+  <img src="assets/sys_init.png" width="450">
 </div>
 
 ### Command-Line Arguments
@@ -159,3 +160,5 @@ python .\main.py --display --sound
 
 Unlicense - Public domain. Go catch 'em all without breaking the bank.
 
+---
+### Developed by Sean Clayton
